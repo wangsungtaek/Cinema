@@ -20,7 +20,7 @@ export default {
   name: 'LoginView',
   methods: {
     lineLogin() {
-      location.href="https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1657401047&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fmain&state=12345abcde&scope=profile%20openid"
+      location.href="https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=1657212052&redirect_uri=http%3A%2F%2F127.0.0.1%3A8080%2Fmain&state=12345abcde&scope=profile%20openid"
     }
   }
 }

@@ -5,13 +5,13 @@ import MainView from '../views/MainView.vue'
 const routes = [
   {
     path: '/',
-    name: 'Login',
-    component: LoginView
-  },
-  {
-    path: '/main',
     name: 'Main',
     component: MainView
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: LoginView
   }
 ]
 
