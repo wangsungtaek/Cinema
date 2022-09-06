@@ -1,15 +1,11 @@
-export default {
-  install(app, options) {
+import axios from "axios";
 
-    app.config.globalProperties.$api =  async (url, method, data) => {
-      return (await axios({
-          method: method,
-          url,
-          data
-      }).catch(e => {
-          console.log(e);
-      })).data
-    };
-    
-  }
+export default async function api(url, method, headers) {
+  return (await axios({
+      method: method,
+      url,
+      headers
+  }).catch(e => {
+      console.log(e);
+  })).data
 }
