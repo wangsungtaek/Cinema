@@ -157,8 +157,7 @@ class LBD {
     const { timestamp, nonce, signature } = await this.getSignature('GET', path);
     const headers = this.getHeader(nonce, timestamp, signature);
 
-    const response = await axios.get(path, { headers: headers });
-    return response.data;
+    return await api(path, 'GET', headers);
   }
   /*******************************************************************************
    * FUNCTION 명 : getNonFungibleByTokenIndex()
@@ -170,8 +169,55 @@ class LBD {
     const { timestamp, nonce, signature } = await this.getSignature('GET', path);
     const headers = this.getHeader(nonce, timestamp, signature);
 
-    const response = await axios.get(path, { headers: headers });
-    return response.data;
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getNonFungibleHolder()
+   * FUNCTION 기능설명 : NonFungible 사용자 조회
+  *******************************************************************************/
+  async getNonFungibleHolder(contractId, tokenType) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/holders`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getNonFungibleHolderByIndex()
+   * FUNCTION 기능설명 : TokenIdex로 NonFungible 사용자 조회
+  *******************************************************************************/
+  async getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/holder`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getServiceWallet()
+   * FUNCTION 기능설명 : Service Wallet 조회
+  *******************************************************************************/
+  async getServiceWallet() {
+    const path = `/v1/wallets`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getServiceWalletHistory()
+   * FUNCTION 기능설명 : Service Wallet History 조회
+  *******************************************************************************/
+  async getServiceWalletHistory(walletAddress) {
+    const path = `/v1/wallets/${walletAddress}/transactions`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
   }
 
   /*******************************************************************************
