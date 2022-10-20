@@ -220,11 +220,144 @@ class LBD {
     return await api(path, 'GET', headers);
   }
 
+
+  /*************************************************************************************************************************
+    User 조회 관련
+  *************************************************************************************************************************/
+
+  /*******************************************************************************
+   * FUNCTION 명 : getUserInfo()
+   * FUNCTION 기능설명 : 사용자 정보 조회
+  *******************************************************************************/
+   async getUserInfo(userId) {
+    const path = `/v1/users/${userId}`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getUserBaseCoin()
+   * FUNCTION 기능설명 : 사용자 TC 조회
+  *******************************************************************************/
+   async getUserBaseCoin(userId) {
+    const path = `/v1/users/${userId}/base-coin`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getUserServiceToken()
+   * FUNCTION 기능설명 : 사용자 Service Token 조회
+  *******************************************************************************/
+   async getUserServiceToken(userId) {
+    const path = `/v1/users/${userId}/service-tokens`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getUserItemToken()
+   * FUNCTION 기능설명 : 사용자 Item Token 조회
+  *******************************************************************************/
+   async getUserItemToken(userId, contractId) {
+    const path = `/v1/users/${userId}/item-tokens/${contractId}/non-fungibles`;
+    
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : mintNFT()
+   * FUNCTION 기능설명 : NFT 민팅
+  *******************************************************************************/
+   async mintNFT(contractId, tokenType, userId) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/mint`;
+    
+    const body = {
+      'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
+      'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'name': 'mintTest',
+      'toUserId': userId
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : getUserServiceTokenProxyState()
+   * FUNCTION 기능설명 : 사용자 Service Token 프록시 상태 조회
+  *******************************************************************************/
+  async getUserServiceTokenProxyState(userId, contractId) { 
+    const path = `/v1/users/${userId}/service-tokens/${contractId}/proxy`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
+
+  /*************************************************************************************************************************
+    User 발행 관련
+  *************************************************************************************************************************/
+  
+  /*******************************************************************************
+   * FUNCTION 명 : setUserServiceTokenProxy()
+   * FUNCTION 기능설명 : User Service Token 프록시 설정
+  *******************************************************************************/
+  async setUserServiceTokenProxy(userId, contractId) {
+    const path = `/v1/users/${userId}/service-tokens/${contractId}/request-proxy`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+    const queryParam = {
+      'requestType': 'aoa'
+    };
+    const body = {
+      ownerAddress: "tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05",
+    }
+
+    return await api(path, 'POST', headers, queryParam, body);
+  }
+  /*************************************************************************************************************************
+    User 전송 관련
+  *************************************************************************************************************************/
+
+  /*******************************************************************************
+   * FUNCTION 명 : transServiceToken()
+   * FUNCTION 기능설명 : Service Token 전송
+  *******************************************************************************/
+  async transServiceToken(userId, contractId) {
+    const path = `/v1/users/${userId}/service-tokens/${contractId}/transfer`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+    const body = {
+      ownerAddress: "tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05",
+      ownerSecret: "knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=",
+      toUserId: "U0e15799fc3b13d394670819ce262a63a",
+      amount: "1"
+    }
+
+    return await api(path, 'POST', headers, null, body);
+  }
+  
+  /*************************************************************************************************************************
+    ETC
+  *************************************************************************************************************************/
+
   /*******************************************************************************
    * FUNCTION 명 : getSignature()
    * FUNCTION 기능설명 : Signature 생성
   *******************************************************************************/
-  async getSignature(method, path) {
+  async getSignature(method, path, params, body) {
     const timestamp = await this.getTimeStamp();
     const nonce = this.getNonce();
     const signature = SignatureGenerator.signature(
@@ -233,6 +366,8 @@ class LBD {
       , path
       , timestamp
       , nonce
+      , params
+      , body
     );
 
     return {
