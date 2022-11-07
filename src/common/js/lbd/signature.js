@@ -18,11 +18,9 @@ export default class SignatureGenerator {
         }
         
         let signTarget = createSignTarget();
-
+      
         if (obj && _.size(obj) > 0) {
             signTarget += this.flatten(obj);
-            console.log('#### signTarget', signTarget);
-            console.log('');
         }
         let hash = CryptoJs.HmacSHA512(signTarget, apiSecret);
         return CryptoJs.enc.Base64.stringify(hash);
@@ -38,10 +36,8 @@ export default class SignatureGenerator {
               value.forEach(elem => {
                   allSubKeys = _.union(allSubKeys, Object.keys(elem))
               })
-              console.log('#### value: ', value);
               value.forEach(elem => {
                 allSubKeys.forEach(subKey => {
-                  console.log('## subKey :', subKey);
                   const flatKey = `${key}.${subKey}`
                   const flatRawValue = elem[subKey] ? elem[subKey] : EMPTY
                   const prevFlatValue = flatPair[flatKey]

@@ -277,14 +277,14 @@ class LBD {
    * FUNCTION 명 : mintNFT()
    * FUNCTION 기능설명 : NFT 민팅
   *******************************************************************************/
-   async mintNFT(contractId, tokenType, userId) {
+  async mintNFT(contractId, tokenType, toAddress, name) {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/mint`;
     
     const body = {
-      'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
-      'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
-      'name': 'mintTest',
-      'toUserId': userId
+      'ownerAddress': 'link159p2trejz4zfusfkx4eumrup5prlhh90nync6m',
+      'ownerSecret': 'ZTlTEs25NXQhUtu7I/vrlKjpSt+YyDwk2zOYZty+7Js=',
+      'toAddress': toAddress,
+      'name': name
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
     const headers = this.getHeader(nonce, timestamp, signature);
@@ -304,28 +304,52 @@ class LBD {
     return await api(path, 'GET', headers);
   }
 
-  /*************************************************************************************************************************
-    User 발행 관련
-  *************************************************************************************************************************/
   
   /*******************************************************************************
-   * FUNCTION 명 : setUserServiceTokenProxy()
-   * FUNCTION 기능설명 : User Service Token 프록시 설정
+   * FUNCTION 명 : getServiceTokenSession()
+   * FUNCTION 기능설명 : Service Token 세션 토큰 확인
   *******************************************************************************/
-  async setUserServiceTokenProxy(userId, contractId) {
-    const path = `/v1/users/${userId}/service-tokens/${contractId}/request-proxy`;
+  async getServiceTokenSession(userId, contractId) {
+    const path = `/v1/users/${userId}/service-tokens/${contractId}/request-proxy?requestType=aoa`;
 
-    const { timestamp, nonce, signature } = await this.getSignature('POST', path);
-    const headers = this.getHeader(nonce, timestamp, signature);
-    const queryParam = {
-      'requestType': 'aoa'
-    };
-    const body = {
-      ownerAddress: "tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05",
+    const request_body = {
+      'ownerAddress': "tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05",
     }
-
-    return await api(path, 'POST', headers, queryParam, body);
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, request_body);
+    const headers = {
+      ...this.getHeader(nonce, timestamp, signature),
+      'Content-Type': 'application/json'
+    };
+    
+    return await api(path, 'POST', headers, null, request_body);
   }
+
+  /*******************************************************************************
+   * FUNCTION 명 : getServiceTokenSessionState()
+   * FUNCTION 기능설명 : Service Token 세션 토큰 상태 확인
+  *******************************************************************************/
+  async getServiceTokenSessionState(requestSessionToken) { 
+    const path = `/v1/user-requests/${requestSessionToken}`;
+  
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+  
+    return await api(path, 'GET', headers);
+  }
+
+  /*******************************************************************************
+   * FUNCTION 명 : commitServiceTokenSession()
+   * FUNCTION 기능설명 : Service Token 세션 토큰 커밋
+  *******************************************************************************/
+  async commitServiceTokenSession(requestSessionToken) {
+      const path = `/v1/user-requests/${requestSessionToken}/commit`;
+  
+      const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, {});
+      const headers = this.getHeader(nonce, timestamp, signature);
+      
+      return await api(path, 'POST', headers, null, null);
+  }
+
   /*************************************************************************************************************************
     User 전송 관련
   *************************************************************************************************************************/
@@ -348,6 +372,107 @@ class LBD {
 
     return await api(path, 'POST', headers, null, body);
   }
+
+
+
+  /*******************************************************************************
+   * FUNCTION 명 : Transfer service tokens()
+   * FUNCTION 기능설명 : Service Token 전송
+  *******************************************************************************/
+  async transferServiceToken(toUID, amount) {
+    const walletAddress = 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05';
+    const contractId = '9990f166';
+
+    const path = `/v1/wallets/${walletAddress}/service-tokens/${contractId}/transfer`;
+    console.log(toUID, amount);
+    const body = {
+      'walletSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'toUserId': toUID,
+      'amount': amount,
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+  
+  /*******************************************************************************
+   * FUNCTION 명 : transferDelegatedServiceToken()
+   * FUNCTION 기능설명 : 위임된 서비스 토큰 전송(사용자 지갑)
+  *******************************************************************************/
+   async transferDelegatedServiceToken(fromUID, toAddress, amount) {
+    const contractId = '9990f166';
+
+    const path = `/v1/users/${fromUID}/service-tokens/${contractId}/transfer`;
+    const body = {
+      'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
+      'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'toAddress': toAddress,
+      'amount': amount,
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+
+
+  /*******************************************************************************
+   * FUNCTION 명 : updateNftInfo()
+   * FUNCTION 기능설명 : NFT 정보 수정
+  *******************************************************************************/
+   async updateNftInfo(contractId, tokenType, tokenIndex, name) {
+
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}`;
+    
+    const body = {
+      'name': name,
+      'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
+      'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds='
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('PUT', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'PUT', headers, null, body);
+  }
+
+  /*******************************************************************************
+    * FUNCTION 명 : updateNftThumbnails()
+    * FUNCTION 기능설명 : 썸네일 업데이트 요청
+  *******************************************************************************/
+  async updateNftThumbnails(contractId) {
+
+    const path = `/v1/item-tokens/${contractId}/fungibles/thumbnails`;
+    
+    const body = {
+      'updateList': [
+        {
+          'tokenType': '10000001'
+        }
+      ]
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('PUT', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'PUT', headers, null, body);
+  }
+
+  /*******************************************************************************
+    * FUNCTION 명 : getThumbnailsUpdateState()
+    * FUNCTION 기능설명 : 썸네일 업데이트 상태 확인
+  *******************************************************************************/
+   async getThumbnailsUpdateState(contractId, requestId) {
+
+    const path = `/v1/item-tokens/${contractId}/fungibles/thumbnails/${requestId}/status`;
+    
+    const body = {}
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers, null, body);
+  }
+
   
   /*************************************************************************************************************************
     ETC
@@ -378,7 +503,7 @@ class LBD {
   }
 
   /*******************************************************************************
-   * FUNCTION 명 : getSignature()
+   * FUNCTION 명 : getHeader()
    * FUNCTION 기능설명 : Signature 생성
   *******************************************************************************/
   getHeader(nonce, timestamp, signature) {
@@ -395,8 +520,9 @@ class LBD {
    * FUNCTION 기능설명 : 타임스탬프 조회
   *******************************************************************************/
   async getTimeStamp() {
-    const response = await axios.get(`/v1/time`, { headers: { 'service-api-key': apiKey } })
-    const timeStamp = response.data.responseTime;
+    // const response = await axios.get(`/v1/time`, { headers: { 'service-api-key': apiKey } })
+    // const timeStamp = response.data.responseTime;
+    const timeStamp = Date.now();
     return timeStamp;
   }
 
@@ -407,6 +533,7 @@ class LBD {
   getNonce() {
     return generateRandomString(8);
   }
+  
 }
 
 export default LBD;
