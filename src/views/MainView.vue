@@ -170,6 +170,9 @@
           <el-button type="primary" @click="getNftHolderByTokenType" class="customButton">
             NFT 여러 홀더 조회 및 csv 저장
           </el-button>
+          <el-button type="primary" @click="getNftHolderByTokenType2" class="customButton">
+            나누어 저장
+          </el-button>
         </el-card>
 
         <!-- NFT 민트 -->
@@ -230,6 +233,19 @@
           
           <el-button type="primary" @click="getThumbnailsUpdateState" class="customButton">
             NFT 썸네일 업데이트 확인
+          </el-button>
+        </el-card>
+
+        <!-- DOSI Wallet 연동 -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >DOSI Wallet 연동</h3>
+            </div>
+          </template>
+          
+          <el-button type="primary" @click="connectDosiWallet" class="customButton">
+            DOSI Wallet 연동
           </el-button>
         </el-card>
 
@@ -471,12 +487,13 @@ export default {
         try {
           tokenIndex = number.toString(16).padStart(8, '0');
           const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
-          const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
-          console.log(info);
+          // const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
+          // console.log(info);
+          console.log(tokenIndex);
 
           arrayIndex.push(tokenIndex);
           arrayHoder.push(hoder.responseData.walletAddress);
-          arrayMeta.push(info.responseData.meta);
+          // arrayMeta.push(info.responseData.meta);
 
           number++;
         } catch {
@@ -485,13 +502,13 @@ export default {
       }
       
       console.log(arrayIndex);
-      console.log(arrayMeta);
+      // console.log(arrayMeta);
       console.log(arrayHoder);
       row.push(
         "token type",
         "token index",
         "address",
-        "meta"
+        // "meta"
       )
 
       csv.push(row.join(","));
@@ -503,7 +520,68 @@ export default {
           tokenType,
           arrayIndex[i],
           arrayHoder[i],
-          arrayMeta[i]
+          // arrayMeta[i]
+        )
+        csv.push(row.join(","));
+      }
+      console.log('1233123: ', csv);
+      this.downloadCSV(csv.join("\n"), "10000001");
+
+    },
+    async getNftHolderByTokenType2() {
+      const contractId = this.nft.contractId;
+      const tokenType = this.nft.tokenType;
+
+      let from = 28_728;
+      let to = 100_000;
+
+      let arrayIndex = [];
+      let arrayHoder = [];
+      let tokenIndex = '';
+
+      let csv = [];
+      let row = [];
+
+      // 1 ~ 100_000
+      // 100_001 ~ 200_000
+      // 200_001 ~ 300_000
+      // 300_001 ~ 400_000
+      // 400_001 ~ 500_000
+      // 500_001 ~ 600_000
+      // 600_001 ~ 700_000
+      // 700_001 ~ 800_000
+      // 800_001 ~ 900_000
+      // 900_001 ~ 1_000_000
+      // 1_000_001 ~ 1_100_000
+      for(; from<=to; from++) {
+        try {
+          tokenIndex = from.toString(16).padStart(8, '0');
+          const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
+          console.log(tokenIndex);
+
+          arrayIndex.push(tokenIndex);
+          arrayHoder.push(hoder.responseData.walletAddress);
+        } catch {
+          break;
+        }
+      }
+
+      console.log(arrayHoder);
+      row.push(
+        "token type",
+        "token index",
+        "address",
+      )
+
+      csv.push(row.join(","));
+      console.log('1111', arrayIndex.length);
+
+      for(let i=0; i < arrayIndex.length; i++) {
+        row = [];
+        row.push(
+          tokenType,
+          arrayIndex[i],
+          arrayHoder[i],
         )
         csv.push(row.join(","));
       }
@@ -566,7 +644,12 @@ export default {
       
       const response = await this.lbd.getThumbnailsUpdateState(contractId, requestId);
       console.log(response);
-    }
+    },
+
+    // DOSI Wallet 연결
+    async connectDosiWallet() {
+      
+    },
 
   }
 }
