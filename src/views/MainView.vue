@@ -529,11 +529,13 @@ export default {
 
     },
     async getNftHolderByTokenType2() {
-      const contractId = this.nft.contractId;
-      const tokenType = this.nft.tokenType;
+      const contractId = 'f68e7fd5';
+      const tokenType = '10000001';
 
-      let from = 28_728;
-      let to = 100_000;
+      // let from = 128_118;
+      // let to = 130_000;
+      let from = 128_118;
+      let to = 128_130;
 
       let arrayIndex = [];
       let arrayHoder = [];
@@ -542,18 +544,11 @@ export default {
       let csv = [];
       let row = [];
 
-      // 1 ~ 100_000
-      // 100_001 ~ 200_000
-      // 200_001 ~ 300_000
-      // 300_001 ~ 400_000
-      // 400_001 ~ 500_000
-      // 500_001 ~ 600_000
-      // 600_001 ~ 700_000
-      // 700_001 ~ 800_000
-      // 800_001 ~ 900_000
-      // 900_001 ~ 1_000_000
-      // 1_000_001 ~ 1_100_000
-      for(; from<=to; from++) {
+      const sleep = (ms) => {
+       return new Promise((resolve) => setTimeout(resolve, ms))
+      }
+
+      for(; from <= to; from++) {
         try {
           tokenIndex = from.toString(16).padStart(8, '0');
           const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
@@ -561,11 +556,12 @@ export default {
 
           arrayIndex.push(tokenIndex);
           arrayHoder.push(hoder.responseData.walletAddress);
+          await sleep(300);
         } catch {
           break;
         }
       }
-
+      
       console.log(arrayHoder);
       row.push(
         "token type",
@@ -587,7 +583,6 @@ export default {
       }
       console.log('1233123: ', csv);
       this.downloadCSV(csv.join("\n"), "10000001");
-
     },
 
     downloadCSV(csv, filename) {
