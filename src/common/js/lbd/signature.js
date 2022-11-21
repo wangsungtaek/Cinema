@@ -22,6 +22,8 @@ export default class SignatureGenerator {
         if (obj && _.size(obj) > 0) {
             signTarget += this.flatten(obj);
         }
+        console.log('### signTarget:', signTarget);
+        console.log('### apiSecret:', apiSecret);
         let hash = CryptoJs.HmacSHA512(signTarget, apiSecret);
         return CryptoJs.enc.Base64.stringify(hash);
     }

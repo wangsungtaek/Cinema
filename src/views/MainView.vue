@@ -313,7 +313,11 @@ export default {
       // console.log('## time : ', await lbd.getTime());
       // console.log('## transaction :', await lbd.getTransaction('E74124E59B03AD1F912B10C04711755B47E33FEDACB096C63A58B69580C98B7F'));
 
-      // console.log('## Service :', await lbd.getService('3e08fa95-1274-4ec8-89d7-676ec1a61fda'));
+      // console.log('## Service :', await this.lbd.getService('3e08fa95-1274-4ec8-89d7-676ec1a61fda'));
+
+      console.log('## updateNftMediaResources :', await this.lbd.updateNftMediaResources('5de7845d'));
+
+      
       // console.log('## Service Token :', await lbd.getServiceToken());
       // console.log('## Service Token By ContractId :', await lbd.getServiceTokenBycontractId('9990f166'));
       // console.log('## Service Token Holder By ContractId :', await lbd.getServiceTokenHolderBycontractId('9990f166'));
@@ -532,10 +536,8 @@ export default {
       const contractId = 'f68e7fd5';
       const tokenType = '10000001';
 
-      // let from = 128_118;
-      // let to = 130_000;
-      let from = 128_118;
-      let to = 128_130;
+      let from = 300_001;
+      let to = 310_000;
 
       let arrayIndex = [];
       let arrayHoder = [];

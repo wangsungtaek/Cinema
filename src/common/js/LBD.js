@@ -435,6 +435,31 @@ class LBD {
 
     return await api(path, 'PUT', headers, null, body);
   }
+  /*******************************************************************************
+   * FUNCTION 명 : updateNftMediaResources()
+   * FUNCTION 기능설명 : NFT 미디어 리소스 수정
+  *******************************************************************************/
+   async updateNftMediaResources(contractId) {
+
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/media-resources`;
+    
+    const body = {
+      'updateList': [
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000001'
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000002'
+        }
+      ],
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('PUT', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'PUT', headers, null, body);
+  }
 
   /*******************************************************************************
     * FUNCTION 명 : updateNftThumbnails()
@@ -447,7 +472,12 @@ class LBD {
     const body = {
       'updateList': [
         {
-          'tokenType': '10000001'
+          'tokenType': '10000099',
+          'tokenIndex': '00000001' 
+        },
+        {
+          'tokenType': '10000099',
+          'tokenIndex': '00000002' 
         }
       ]
     }
