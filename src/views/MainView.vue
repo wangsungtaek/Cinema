@@ -315,7 +315,7 @@ export default {
 
       // console.log('## Service :', await this.lbd.getService('3e08fa95-1274-4ec8-89d7-676ec1a61fda'));
 
-      console.log('## updateNftMediaResources :', await this.lbd.updateNftMediaResources('5de7845d'));
+      // console.log('## updateNftMediaResources :', await this.lbd.updateNftMediaResources('5de7845d'));
 
       
       // console.log('## Service Token :', await lbd.getServiceToken());
@@ -533,32 +533,33 @@ export default {
 
     },
     async getNftHolderByTokenType2() {
-      const contractId = 'f68e7fd5';
+      const contractId = '298fd7f4';
       const tokenType = '10000001';
 
-      let from = 300_001;
-      let to = 310_000;
+      let from = 1;
+      let to = 5;
 
       let arrayIndex = [];
       let arrayHoder = [];
+      let arrayInfo = [];
       let tokenIndex = '';
 
       let csv = [];
       let row = [];
 
-      const sleep = (ms) => {
-       return new Promise((resolve) => setTimeout(resolve, ms))
-      }
+      let meta = {};
 
       for(; from <= to; from++) {
         try {
           tokenIndex = from.toString(16).padStart(8, '0');
           const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
+          const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
           console.log(tokenIndex);
 
+          meta = JSON.parse(info.responseData.meta);
           arrayIndex.push(tokenIndex);
           arrayHoder.push(hoder.responseData.walletAddress);
-          await sleep(300);
+          arrayInfo.push(meta?.Camp);
         } catch {
           break;
         }
@@ -569,6 +570,7 @@ export default {
         "token type",
         "token index",
         "address",
+        "Camp",
       )
 
       csv.push(row.join(","));
@@ -580,6 +582,7 @@ export default {
           tokenType,
           arrayIndex[i],
           arrayHoder[i],
+          arrayInfo[i],
         )
         csv.push(row.join(","));
       }
