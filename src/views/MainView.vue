@@ -106,7 +106,7 @@
           <el-input v-model="nft.name" placeholder="name" class="customInput"/>
           
           <el-button type="primary" @click="updateNftInfo" class="customButton">
-            유저에게 서비스 토큰 전송
+            NFT 이름 변경
           </el-button>
         </el-card>
 
@@ -534,14 +534,14 @@ export default {
     },
     async getNftHolderByTokenType2() {
       const contractId = '298fd7f4';
-      const tokenType = '10000001';
+      const tokenType = '10000004';
 
       let from = 1;
-      let to = 5;
+      let to = 2;
 
       let arrayIndex = [];
       let arrayHoder = [];
-      let arrayInfo = [];
+      // let arrayInfo = [];
       let tokenIndex = '';
 
       let csv = [];
@@ -553,13 +553,13 @@ export default {
         try {
           tokenIndex = from.toString(16).padStart(8, '0');
           const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
-          const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
+          // const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
           console.log(tokenIndex);
 
-          meta = JSON.parse(info.responseData.meta);
+          // meta = JSON.parse(info.responseData.meta);
           arrayIndex.push(tokenIndex);
           arrayHoder.push(hoder.responseData.walletAddress);
-          arrayInfo.push(meta?.Camp);
+          // arrayInfo.push(meta?.Camp);
         } catch {
           break;
         }
@@ -570,7 +570,7 @@ export default {
         "token type",
         "token index",
         "address",
-        "Camp",
+        // "Camp",
       )
 
       csv.push(row.join(","));
@@ -582,7 +582,7 @@ export default {
           tokenType,
           arrayIndex[i],
           arrayHoder[i],
-          arrayInfo[i],
+          // arrayInfo[i],
         )
         csv.push(row.join(","));
       }
@@ -595,10 +595,10 @@ export default {
       let downloadLink;
 
       //한글 처리를 해주기 위해 BOM 추가하기
-      const BOM = "\uFEFF";
-      csv = BOM + csv;
+      // const BOM = "\uFEFF";
+      // csv = BOM + csv;
 
-      csvFile = new Blob([csv], { type: "text/csv" });
+      csvFile = new Blob([csv], { type: "text;" });
       downloadLink = document.createElement("a");
       downloadLink.download = filename;
       downloadLink.href = window.URL.createObjectURL(csvFile);
@@ -654,16 +654,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-.customCard {
-  width: 400px;
-  height: 350px;
-}
-
-.customButton, .customInput {
-  margin: 10px 0px;
-  width: 100%;
-}
-</style>

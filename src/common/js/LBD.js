@@ -220,6 +220,26 @@ class LBD {
     return await api(path, 'GET', headers);
   }
 
+  /*************************************************************************************************************************
+    Item Token 조회 관련
+  *************************************************************************************************************************/
+  /*******************************************************************************
+   * FUNCTION 명 : getItemTokenHolders()
+   * FUNCTION 기능설명 : Contract Id, Token Type을 통한 홀더들 조회
+  *******************************************************************************/
+  async getItemTokenHolders(contractId, tokenType, limit, page) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/holders`;
+
+    const query_param = {
+      'limit': limit + '',
+      'orderBy': 'desc',
+      'page': page + ''
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);
+    const headers = this.getHeader(nonce, timestamp, signature);
+    
+    return await api(path, 'GET', headers, query_param);
+  }
 
   /*************************************************************************************************************************
     User 조회 관련
@@ -281,8 +301,8 @@ class LBD {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/mint`;
     
     const body = {
-      'ownerAddress': 'link159p2trejz4zfusfkx4eumrup5prlhh90nync6m',
-      'ownerSecret': 'ZTlTEs25NXQhUtu7I/vrlKjpSt+YyDwk2zOYZty+7Js=',
+      'ownerAddress': 'tlink186xnynpa2l6d9lhez9rzujdrf6g63t3ltl9874',
+      'ownerSecret': 'ewVaF3WviV6GPET6gmpYG+AzaVDJsbtvcu454mKjoJ8=',
       'toAddress': toAddress,
       'name': name
     }
@@ -381,14 +401,15 @@ class LBD {
   *******************************************************************************/
   async transferServiceToken(toUID, amount) {
     const walletAddress = 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05';
-    const contractId = '9990f166';
+    const contractId = '3e942bd7';
+    const resultAmount = amount * 1_000_000;
 
     const path = `/v1/wallets/${walletAddress}/service-tokens/${contractId}/transfer`;
     console.log(toUID, amount);
     const body = {
       'walletSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
       'toUserId': toUID,
-      'amount': amount,
+      'amount': resultAmount + '',
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
     const headers = this.getHeader(nonce, timestamp, signature);
@@ -401,14 +422,15 @@ class LBD {
    * FUNCTION 기능설명 : 위임된 서비스 토큰 전송(사용자 지갑)
   *******************************************************************************/
    async transferDelegatedServiceToken(fromUID, toAddress, amount) {
-    const contractId = '9990f166';
+    const contractId = '3e942bd7';
+    const resultAmount = amount * 1_000_000;
 
     const path = `/v1/users/${fromUID}/service-tokens/${contractId}/transfer`;
     const body = {
       'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
       'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
       'toAddress': toAddress,
-      'amount': amount,
+      'amount': resultAmount + '',
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
     const headers = this.getHeader(nonce, timestamp, signature);
@@ -427,6 +449,7 @@ class LBD {
     
     const body = {
       'name': name,
+      'meta': '{"🍭test": "1112"}',
       'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
       'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds='
     }

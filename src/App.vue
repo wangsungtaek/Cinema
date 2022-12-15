@@ -25,4 +25,14 @@ nav a {
 nav a.router-link-exact-active {
   color: #42b983;
 }
+
+.customCard {
+  width: 400px;
+  height: 350px;
+}
+
+.customButton, .customInput {
+  margin: 10px 0px;
+  width: 100%;
+}
 </style>

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import MainView from '../views/MainView.vue'
+import ExportDataView from '@/views/ExportDataView.vue'
 
 const routes = [
   {
@@ -17,7 +18,12 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginView
-  }
+  },
+  {
+    path: '/exportData',
+    name: 'ExportData',
+    component: ExportDataView
+  },
 ]
 
 const router = createRouter({

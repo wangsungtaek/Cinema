@@ -11,6 +11,6 @@ module.exports = defineConfig({
   },
 
   devServer: {
-    proxy: 'https://test-api.blockchain.line.me'
+    proxy: 'https://api.blockchain.line.me'
   },
 })
