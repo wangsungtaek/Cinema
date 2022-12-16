@@ -232,7 +232,6 @@ class LBD {
 
     const query_param = {
       'limit': limit + '',
-      'orderBy': 'desc',
       'page': page + ''
     }
     const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);

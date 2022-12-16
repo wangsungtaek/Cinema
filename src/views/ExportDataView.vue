@@ -9,7 +9,7 @@
 
       <el-space wrap>
         <!-- Contract ID, Token Type으로 홀더 조회 -->
-        <el-card class="box-card customCard">
+        <el-card class="box-card customCard" style="height: 400px;">
           <template #header>
             <div class="card-header">
               <h3 style="margin: 0px" >NFT 보유 홀더 조회</h3>
@@ -17,10 +17,16 @@
           </template>
           <el-input v-model="contractId" placeholder="contractId" class="customInput"/>
           <el-input v-model="tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="fromPage" placeholder="fromPage" class="customInput"/>
+          <el-input v-model="toPage" placeholder="toPage" class="customInput"/>
           <div></div>
           <el-button type="primary" @click="getHolders" class="customButton">
             홀더 조회
           </el-button>
+          <el-input v-model="currentPage" placeholder="current Page" class="customInput" disabled="true"/>
+          <!-- <el-button type="primary" @click="getHolders_2" class="customButton">
+            홀더 조회-2
+          </el-button> -->
         </el-card>
       </el-space>
 
@@ -30,13 +36,17 @@
 
 <script>
 import LBD from '@/common/js/LBD';
+import axios from "axios";
 
 export default {
   data() {
     return {
-      contractId: '8c8fc103',
+      contractId: 'f68e7fd5',
       tokenType: '10000001',
       lbd: {},
+      fromPage: '1',
+      toPage: '30',
+      currentPage: '0'
     }
   },
 
@@ -50,8 +60,8 @@ export default {
       let result = {};
       let responseData = [];
 
-      let fromPage = 1;
-      let toPage = 100;
+      let fromPage = this.fromPage;
+      let toPage = this.toPage;
       const limit = 50;
       
       const addressArray = [];
@@ -62,8 +72,9 @@ export default {
         try {
           result = await this.lbd.getItemTokenHolders(this.contractId, this.tokenType, limit, fromPage);
           responseData = result?.responseData;
-          console.log(`## ${fromPage}Page ##`);
+          this.currentPage = fromPage;
           console.log(responseData);
+          // console.log(responseData);
           if(result?.responseData.length == 0) {
             break;
           }
@@ -99,7 +110,16 @@ export default {
 
     },
 
+    async getHolders_2() {
 
+      let search_from = 'top'
+      let CYCLE = 100;
+
+      for(let i = 0; i <= CYCLE; i++) {
+        const result = await axios({ method: 'get', url: `v1/4380402001/item-token-types/f68e7fd5/10000001/holders?size=500&search_from=${search_from}` });
+        console.log(result?.data);
+      }
+    },
 
     downloadCSV(csv, filename) {
       let csvFile;
