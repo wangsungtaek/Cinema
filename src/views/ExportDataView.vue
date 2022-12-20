@@ -60,8 +60,10 @@ export default {
       let result = {};
       let responseData = [];
 
-      let fromPage = this.fromPage;
-      let toPage = this.toPage;
+      let fromPage = Number(this.fromPage);
+      let toPage = Number(this.toPage);
+      console.log(fromPage);
+      console.log(toPage);
       const limit = 50;
       
       const addressArray = [];
