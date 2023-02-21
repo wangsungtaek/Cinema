@@ -178,10 +178,11 @@ export default {
       const arrayIndex = [];
       const arrayHoder = [];
       const arrayInfo = [];
+      let tokenIndex = '';
 
       for(let i = startNum; i <= endNum; i++) {
         try {
-          let tokenIndex = i.toString(16).padStart(8, '0');
+          tokenIndex = i.toString(16).padStart(8, '0');
           const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
           const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
 
@@ -189,7 +190,7 @@ export default {
           arrayHoder.push(hoder?.responseData?.walletAddress);
           arrayInfo.push(info?.responseData?.meta);
         } catch {
-          alert(`An error occurred while requesting index number "${i}".`);
+          alert(`An error occurred while requesting index number "${tokenIndex}".`);
           break;
         }
       }
