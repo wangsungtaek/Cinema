@@ -23,10 +23,35 @@
           <el-button type="primary" @click="getHolders" class="customButton">
             홀더 조회
           </el-button>
-          <el-input v-model="currentPage" placeholder="current Page" class="customInput" disabled="true"/>
+          <el-input v-model="currentPage" placeholder="current Page" class="customInput" :disabled=true />
           <!-- <el-button type="primary" @click="getHolders_2" class="customButton">
             홀더 조회-2
           </el-button> -->
+        </el-card>
+
+        <!-- Contract ID, Token Type으로 홀더 조회 -->
+        <el-card class="box-card customCard" style="height: 400px; position: relative;">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT 보유 홀더 + Meta 데이터</h3>
+            </div>
+          </template>
+          <el-input v-model="contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="startIndex" placeholder="start Index" class="customInput" maxlength="8"/>
+          <span class="exStyle" style="bottom: 177px;">Ex) 00000001</span>
+          <el-input v-model="endIndex" placeholder="end Index" class="customInput" maxlength="8"/>
+          <span class="exStyle" style="bottom: 125px;">Ex) 0000000a</span>
+          <div></div>
+          <div class="mb-2 flex items-center text-sm">
+            <el-radio-group v-model="format" class="ml-4">
+              <el-radio label="csv" size="large">.csv</el-radio>
+              <el-radio label="txt" size="large">.txt</el-radio>
+            </el-radio-group>
+          </div>
+          <el-button type="primary" @click="getNftHolderByTokenType(contractId, tokenType, startIndex, endIndex)" class="customButton">
+            조회
+          </el-button>
         </el-card>
       </el-space>
 
@@ -46,7 +71,10 @@ export default {
       lbd: {},
       fromPage: '1',
       toPage: '30',
-      currentPage: '0'
+      currentPage: '0',
+      startIndex: '',
+      endIndex: '',
+      format: 'txt'
     }
   },
 
@@ -123,17 +151,78 @@ export default {
       }
     },
 
-    downloadCSV(csv, filename) {
+    async getNftHolderByTokenType(contractId, tokenType, startIndex, endIndex) {
+      
+      // 반복 횟수
+      let startNum = parseInt(startIndex, 16);
+      let endNum = parseInt(endIndex, 16);
+
+      if(!contractId || !tokenType || !startIndex || !endIndex) {
+        alert(`Input value is missing.Please enter a value.`);
+        return;
+      }
+
+      if(startNum > endNum) {
+        alert(`StartIndex cannot be greater than EndIndex.`);
+        return;
+      }
+
+      const exportData = await this.getHolderAndMetaData(contractId, tokenType, startNum, endNum);
+      if(exportData.length > 1) {
+        this.downloadCSV(exportData.join("\n"), contractId);
+      }
+    },
+
+    async getHolderAndMetaData(contractId, tokenType, startNum, endNum) {
+
+      const arrayIndex = [];
+      const arrayHoder = [];
+      const arrayInfo = [];
+
+      for(let i = startNum; i <= endNum; i++) {
+        try {
+          let tokenIndex = i.toString(16).padStart(8, '0');
+          const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
+          const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
+
+          arrayIndex.push(tokenIndex);
+          arrayHoder.push(hoder?.responseData?.walletAddress);
+          arrayInfo.push(info?.responseData?.meta);
+        } catch {
+          alert(`An error occurred while requesting index number "${i}".`);
+          break;
+        }
+      }
+
+      let row = [];
+      let csv = [];
+
+      row.push("token type", "token index", "address", "meta")
+      csv.push(row.join(","));
+
+      for(let i = 0; i < arrayIndex.length; i++) {
+        row = [];
+        row.push(tokenType, arrayIndex[i], arrayHoder[i], arrayInfo[i])
+        csv.push(row.join(","));
+      }
+
+      return csv;
+    },
+
+    downloadCSV(csv, contractId) {
+      const nowDate = new Date();
+      const fileName = `${nowDate.getFullYear()}${nowDate.getMonth()+1}${nowDate.getDate()}_${nowDate.getHours()}${nowDate.getMinutes()}${nowDate.getSeconds()}_${contractId}`;
+
       let csvFile;
       let downloadLink;
 
       //한글 처리를 해주기 위해 BOM 추가하기
       // const BOM = "\uFEFF";
       // csv = BOM + csv;
-
-      csvFile = new Blob([csv], { type: "text;" });
+      
+      csvFile = new Blob([csv], { type: `${(this.format == 'txt') ? 'text;charset=utf-8' : 'text/csv;charset=utf-8' }` });
       downloadLink = document.createElement("a");
-      downloadLink.download = filename;
+      downloadLink.download = fileName;
       downloadLink.href = window.URL.createObjectURL(csvFile);
       downloadLink.style.display = "none";
       document.body.appendChild(downloadLink);
@@ -144,5 +233,12 @@ export default {
 </script>
 
 <style>
-
+.exStyle {
+  font-size: 13px;
+  color: #eb9a9a;
+  font-weight: bold;
+  text-align: right;
+  position: absolute;
+  right: 30px;
+}
 </style>

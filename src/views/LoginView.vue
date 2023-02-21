@@ -32,7 +32,8 @@ export default {
     },
 
     dosiWalletLogin() {
-      location.href="https://dosi-wallet.line-apps-beta.com/auth/login?returnUri=http%3A%2F%2F127.0.0.1%3A8080%2Fmain"
+      location.href="https://dosi-members.line-apps-beta.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=pgp_jT6IDWPBQYmWqy7T&scope=profile%20email&returnUri=http%3A%2F%2Flocalhost%3A8080%2Fmain"
+      // location.href="https://dosi-members.line-apps-alpha.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=yOTNDbqmomqZLK3Fk30j&scope=profile%20email&returnUri=https%3A%2F%2Fdosi-game.line-apps-alpha.com%2Fauth%2Flogin%2Foauth%2Fcode1"
     }
   }
 }

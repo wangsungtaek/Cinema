@@ -21,6 +21,19 @@
             <el-input v-model="serverTime" disabled placeholder="Server Time" class="customInput"/>  
         </el-card>
 
+        <!-- Tx Hash 확인 -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >Tx Hash 조회</h3>
+            </div>
+          </template>
+            <el-input v-model="txHash" placeholder="txHash" class="customInput"/>
+            <el-button type="primary" @click="getTxHash" class="customButton">
+              Tx Hash 확인
+            </el-button>
+        </el-card>
+
         <!-- 서비스 토큰 프록시 상태 확인 -->
         <el-card class="box-card customCard">
           <template #header>
@@ -249,6 +262,22 @@
           </el-button>
         </el-card>
 
+        <!-- NFT Issue -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT Issue</h3>
+            </div>
+          </template>
+          <el-input v-model="nft.contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="nft.name" placeholder="name" class="customInput"/>
+          <el-input v-model="nft.meta" placeholder="meta" class="customInput"/>
+          
+          <el-button type="primary" @click="issueNFT" class="customButton">
+            NFT Issue
+          </el-button>
+        </el-card>
+
       </el-space>
 
     </el-container>
@@ -266,6 +295,7 @@ export default {
     return {
       lbd: {},
       serverTime: '',
+      txHash: '',
       serviceTokenProxy: {
         uid: '',
         contractId: '',
@@ -289,7 +319,7 @@ export default {
         name: '',
         userId: '',
         requestId: ''
-      }
+      },
     }
   },
 
@@ -305,6 +335,11 @@ export default {
       const response = await this.lbd.getTime();
       console.log(response);
       this.serverTime = response?.responseTime;
+    },
+    // 해시 조회
+    async getTxHash() {
+      const response = await this.lbd.getTxHash(this.txHash);
+      console.log(response);
     },
 
     async testAPI() {
@@ -478,7 +513,7 @@ export default {
       const tokenType = this.nft.tokenType;
 
       let isEnd = true;
-      let number = 1;
+      let number = 488;
       let tokenIndex = '';
 
       let csv = [];
@@ -491,13 +526,13 @@ export default {
         try {
           tokenIndex = number.toString(16).padStart(8, '0');
           const hoder = await this.lbd.getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex);
-          // const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
-          // console.log(info);
+          const info = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
+          console.log(info);
           console.log(tokenIndex);
 
           arrayIndex.push(tokenIndex);
           arrayHoder.push(hoder.responseData.walletAddress);
-          // arrayMeta.push(info.responseData.meta);
+          arrayMeta.push(info.responseData.meta);
 
           number++;
         } catch {
@@ -509,10 +544,10 @@ export default {
       // console.log(arrayMeta);
       console.log(arrayHoder);
       row.push(
-        "token type",
+        // "token type",
         "token index",
         "address",
-        // "meta"
+        "meta"
       )
 
       csv.push(row.join(","));
@@ -521,10 +556,10 @@ export default {
       for(let i=0; i < arrayIndex.length; i++) {
         row = [];
         row.push(
-          tokenType,
+          // tokenType,
           arrayIndex[i],
           arrayHoder[i],
-          // arrayMeta[i]
+          arrayMeta[i]
         )
         csv.push(row.join(","));
       }
@@ -650,6 +685,16 @@ export default {
     async connectDosiWallet() {
       
     },
+    async issueNFT() {
+      const contractId = this.nft.contractId;
+      const name = this.nft.name;
+      const meta = this.nft.meta;
+      
+      for(let i=0; i<200; i++) {
+        const response = await this.lbd.issueNFT(contractId, name, meta);
+        console.log(response);
+      }
+    }
 
   }
 }

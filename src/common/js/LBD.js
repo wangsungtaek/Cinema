@@ -2,7 +2,7 @@ import api from './myGlobal';
 import axios from "axios";
 import SignatureGenerator from "./lbd/signature";
 import { generateRandomString } from './lbd/randomStr.js';
-import { walletAddress, apiKey, apiSecret } from './lbd/header.js';
+import { walletAddress, walletSecret, apiKey, apiSecret } from './lbd/header.js';
 
 class LBD {
 
@@ -21,7 +21,20 @@ class LBD {
     const headers = this.getHeader(nonce, timestamp, signature);
 
     return await api(path, 'GET', headers);
-  };
+  }
+
+  /*******************************************************************************
+   * FUNCTION 명 : getTxHash()
+   * FUNCTION 기능설명 : Tx Hash 조회
+  *******************************************************************************/
+  async getTxHash(txHash) {
+    const path = `/v2/transactions/${txHash}`;
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'GET', headers);
+  }
 
   /*******************************************************************************
    * FUNCTION 명 : getTransaction()
@@ -151,13 +164,13 @@ class LBD {
    * FUNCTION 명 : getNonFungibleByTokenType()
    * FUNCTION 기능설명 : tokenType으로 NonFungible 조회
   *******************************************************************************/
-   async getNonFungibleByTokenType(contractId, tokenType) {
+   async getNonFungibleByTokenType(contractId, tokenType, query_param) {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}`;
 
-    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);
     const headers = this.getHeader(nonce, timestamp, signature);
 
-    return await api(path, 'GET', headers);
+    return await api(path, 'GET', headers, query_param);
   }
   /*******************************************************************************
    * FUNCTION 명 : getNonFungibleByTokenIndex()
@@ -293,6 +306,24 @@ class LBD {
     return await api(path, 'GET', headers);
   }
   /*******************************************************************************
+   * FUNCTION 명 : issueNFT()
+   * FUNCTION 기능설명 : NFT 발행
+  *******************************************************************************/
+  async issueNFT(contractId, name, meta) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles`;
+    
+    const body = {
+      'ownerAddress': walletAddress,
+      'ownerSecret': walletSecret,
+      'name': name + '',
+      'meta': meta + ''
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+  /*******************************************************************************
    * FUNCTION 명 : mintNFT()
    * FUNCTION 기능설명 : NFT 민팅
   *******************************************************************************/
@@ -300,8 +331,8 @@ class LBD {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/mint`;
     
     const body = {
-      'ownerAddress': 'tlink186xnynpa2l6d9lhez9rzujdrf6g63t3ltl9874',
-      'ownerSecret': 'ewVaF3WviV6GPET6gmpYG+AzaVDJsbtvcu454mKjoJ8=',
+      'ownerAddress': walletAddress,
+      'ownerSecret': walletSecret,
       'toAddress': toAddress,
       'name': name
     }
@@ -494,13 +525,9 @@ class LBD {
     const body = {
       'updateList': [
         {
-          'tokenType': '10000099',
+          'tokenType': '10000001',
           'tokenIndex': '00000001' 
         },
-        {
-          'tokenType': '10000099',
-          'tokenIndex': '00000002' 
-        }
       ]
     }
     const { timestamp, nonce, signature } = await this.getSignature('PUT', path, {}, body);
@@ -563,7 +590,8 @@ class LBD {
       'service-api-key': apiKey,
       nonce,
       timestamp,
-      signature
+      signature,
+      'Cache-Control': 'no-cache, private, max-age=0',
     }
   }
 
