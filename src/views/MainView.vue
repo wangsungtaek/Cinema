@@ -64,20 +64,49 @@
           <el-input v-model="serviceTokenProxy.sessionToken" disabled placeholder="Session Token" class="customInput"/>
         </el-card>
 
-        <!-- 서비스 토큰 세션 상태 확인 -->
+
+        <!-- NFT 세션 조회 -->
         <el-card class="box-card customCard">
           <template #header>
             <div class="card-header">
-              <h3 style="margin: 0px" >서비스 토큰 세션 상태</h3>
+              <h3 style="margin: 0px" >NFT 세션 조회</h3>
             </div>
           </template>
-          <el-input v-model="serviceTokenProxy.sessionToken" disabled placeholder="Session Token" class="customInput"/>
+          <el-input v-model="nftProxy.userId" placeholder="UID" class="customInput"/>
+          <el-input v-model="nftProxy.contractId" placeholder="contract id" class="customInput"/>
+          <el-button type="primary" @click="getNFTSession" class="customButton">
+            NFT 세션 조회
+          </el-button>
+          <el-input v-model="nftProxy.sessionToken" disabled placeholder="Session Token" class="customInput"/>
+        </el-card>
+        
+        <!-- 토큰 세션 상태 확인 -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >토큰 세션 상태</h3>
+            </div>
+          </template>
+          <el-input v-model="serviceTokenProxy.sessionToken" placeholder="Session Token" class="customInput"/>
           <el-button type="primary" @click="getServiceTokenSessionState" class="customButton">
-            서비스 토큰 세션 상태
+            토큰 세션 상태
           </el-button>
           <el-input v-model="serviceTokenProxy.sessionToken" disabled placeholder="Session Token Status" class="customInput"/>
         </el-card>
-        
+
+        <!-- 세션 토큰 커밋 -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >세션 토큰 Commit</h3>
+            </div>
+          </template>
+          <el-input v-model="nftProxy.sessionToken" placeholder="Session Token" class="customInput"/>
+          <el-button type="primary" @click="sesstionTokenCommit" class="customButton">
+            세션 토큰 COMMIT
+          </el-button>
+        </el-card>
+
         <!-- 서비스에서 유저에서 서비스 토큰 전송 -->
         <el-card class="box-card customCard">
           <template #header>
@@ -278,6 +307,42 @@
           </el-button>
         </el-card>
 
+        <!-- NFT Transfer -->
+        <el-card class="box-card">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT Transfer</h3>
+            </div>
+          </template>
+          <el-input v-model="nft.userId" placeholder="userId" class="customInput"/>
+          <el-input v-model="nft.contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="nft.tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="nft.tokenIndex" placeholder="tokenIndex" class="customInput"/>
+          <el-input v-model="nft.toAddress" placeholder="toAddress" class="customInput"/>
+          
+          <el-button type="primary" @click="transferNFT" class="customButton">
+            NFT Transfer
+          </el-button>
+        </el-card>
+
+        <!-- so Wallet NFT Transfer -->
+        <el-card class="box-card">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >So Wallet NFT Transfer</h3>
+            </div>
+          </template>
+          <el-input v-model="nft.soWalletAddress" placeholder="soWalletAddress" class="customInput"/>
+          <el-input v-model="nft.contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="nft.tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="nft.tokenIndex" placeholder="tokenIndex" class="customInput"/>
+          <el-input v-model="nft.toAddress" placeholder="toAddress" class="customInput"/>
+          
+          <el-button type="primary" @click="soWalletTransferNFT" class="customButton">
+            So Wallet NFT Transfer
+          </el-button>
+        </el-card>
+
       </el-space>
 
     </el-container>
@@ -301,6 +366,12 @@ export default {
         contractId: '',
         sessionToken: '',
         state: '',
+      },
+      nftProxy: {
+        userId: '',
+        contractId: '',
+        sessionToken: '',
+        state: ''
       },
       service: {
         uid: '',
@@ -335,6 +406,20 @@ export default {
       const response = await this.lbd.getTime();
       console.log(response);
       this.serverTime = response?.responseTime;
+      
+
+      // var myHeaders = new Headers();
+      // myHeaders.append("service-api-key", "76e4f075-a0bc-47ab-a29f-bff360e176fa");
+
+      // var requestOptions = {
+      //   method: 'GET',
+      //   headers: myHeaders,
+      // };
+      
+      // fetch("/v1/time", requestOptions)
+      //   .then(response => response.text())
+      //   .then(result => console.log(result))
+      //   .catch(error => console.log('error', error));
     },
     // 해시 조회
     async getTxHash() {
@@ -459,13 +544,29 @@ export default {
       const status = response?.responseData?.status;
       console.log('## getServiceTokenProxyState: ', status);
 
-      if(status != 'Authorized') {
-        return
-      }
+      // if(status != 'Authorized') {
+      //   return
+      // }
 
-      // // 서비스 토큰 세션 커밋
-      response = await this.lbd.commitServiceTokenSession(this.serviceTokenProxy.sessionToken);
-      console.log('## commitServiceTokenSession: ', response);
+      // // // 서비스 토큰 세션 커밋
+      // response = await this.lbd.commitServiceTokenSession(this.serviceTokenProxy.sessionToken);
+      // console.log('## commitServiceTokenSession: ', response);
+    },
+
+    // NFT 세션 조회
+    async getNFTSession() {
+      const userId = this.nftProxy.userId;
+      const contractId = this.nftProxy.contractId;
+
+      const response = await this.lbd.getNFTSession(userId, contractId);
+      const sessionToken = response?.responseData?.requestSessionToken
+      this.nftProxy.sessionToken = sessionToken;
+    },
+
+    async sesstionTokenCommit() {
+      const sesstionToken = this.nftProxy.sessionToken;
+      const response = await this.lbd.commitSessionToken(sesstionToken);
+      console.log(response);
     },
     
     // NFT 이름 변경
@@ -694,6 +795,35 @@ export default {
         const response = await this.lbd.issueNFT(contractId, name, meta);
         console.log(response);
       }
+    },
+
+    // NFT 전송
+    async transferNFT() {
+
+      const pathParam = {
+        userId: this.nft.userId,
+        contractId: this.nft.contractId,
+        tokenType: this.nft.tokenType,
+        tokenIndex: this.nft.tokenIndex,
+        toAddress: this.nft.toAddress
+      }
+      
+      const response = await this.lbd.transferNFT(pathParam);
+      console.log(response);
+    },
+
+    // 서비스 월렛의 NFT를 전송
+    async soWalletTransferNFT() {
+      const pathParam = {
+        soWalletAddress: this.nft.soWalletAddress,
+        contractId: this.nft.contractId,
+        tokenType: this.nft.tokenType,
+        tokenIndex: this.nft.tokenIndex,
+        toAddress: this.nft.toAddress
+      }
+      console.log(pathParam);
+      const response = await this.lbd.soWalletTransferNFT(pathParam);
+      console.log(response);
     }
 
   }

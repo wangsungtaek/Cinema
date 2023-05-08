@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/LoginView.vue'
 import MainView from '../views/MainView.vue'
 import ExportDataView from '@/views/ExportDataView.vue'
+import UserNFTView from '@/views/UserNFTView.vue'
 
 const routes = [
   {
@@ -12,7 +13,7 @@ const routes = [
   {
     path: '/main',
     name: 'Main',
-    component: MainView
+    component: UserNFTView
   },
   {
     path: '/login',

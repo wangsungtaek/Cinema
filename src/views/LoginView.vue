@@ -32,8 +32,10 @@ export default {
     },
 
     dosiWalletLogin() {
-      location.href="https://dosi-members.line-apps-beta.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=pgp_jT6IDWPBQYmWqy7T&scope=profile%20email&returnUri=http%3A%2F%2Flocalhost%3A8080%2Fmain"
-      // location.href="https://dosi-members.line-apps-alpha.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=yOTNDbqmomqZLK3Fk30j&scope=profile%20email&returnUri=https%3A%2F%2Fdosi-game.line-apps-alpha.com%2Fauth%2Flogin%2Foauth%2Fcode1"
+      // location.href="https://dosi-members.line-apps-beta.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=pgp_jT6IDWPBQYmWqy7T&serviceId=2292e364-b0c6-489e-9402-85844a5725b5&state=1432f43e-5069-4381-9ddf-bc00f49b0e4e&scope=profile%20email&returnUri=http%3A%2F%2Flocalhost%3A8080%2Fmain"
+      location.href="https://dosi-members.line-apps-beta.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=pgp_jT6IDWPBQYmWqy7T&serviceId=2292e364-b0c6-489e-9402-85844a5725b5&state=1432f43e-5069-4381-9ddf-bc00f49b0e4e&scope=profile%20email&returnUri=http://localhost:8080/main"
+      // https://members.dosi.world/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=uO_YLAekg6B8pOMaevMK&serviceId=d9e96e47-9e36-43f4-b9a7-84f98c35d6a4&scope=profile%20email&returnUri=https://ndkonect.xyz/api/dosi/callbac
+      // location.href="https://dosi-members.line-apps-beta.com/api/v1/auth/login/login-bridge?mode=OAUTH&channelId=pgp_jT6IDWPBQYmWqy7T&serviceId=2292e364-b0c6-489e-9402-85844a5725b5&state=1432f43e-5069-4381-9ddf-bc00f49b0e4e&scope=profile%20email"
     }
   }
 }

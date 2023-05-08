@@ -333,7 +333,8 @@ class LBD {
     const body = {
       'ownerAddress': walletAddress,
       'ownerSecret': walletSecret,
-      'toAddress': toAddress,
+      // 'toAddress': toAddress,
+      'toUserId': 'U3e4a86da83dd1649b794f78ac0f813d6',
       'name': name
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
@@ -375,6 +376,25 @@ class LBD {
   }
 
   /*******************************************************************************
+   * FUNCTION 명 : getNFTSession()
+   * FUNCTION 기능설명 : NFT 세션 토큰 확인
+  *******************************************************************************/
+  async getNFTSession(userId, contractId) {
+    const path = `/v1/users/${userId}/item-tokens/${contractId}/request-proxy?requestType=redirectUri`;
+
+    const request_body = {
+      'ownerAddress': "tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05",
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, request_body);
+    const headers = {
+      ...this.getHeader(nonce, timestamp, signature),
+      'Content-Type': 'application/json'
+    };
+    
+    return await api(path, 'POST', headers, null, request_body);
+  }
+
+  /*******************************************************************************
    * FUNCTION 명 : getServiceTokenSessionState()
    * FUNCTION 기능설명 : Service Token 세션 토큰 상태 확인
   *******************************************************************************/
@@ -388,10 +408,10 @@ class LBD {
   }
 
   /*******************************************************************************
-   * FUNCTION 명 : commitServiceTokenSession()
-   * FUNCTION 기능설명 : Service Token 세션 토큰 커밋
+   * FUNCTION 명 : commitSessionToken()
+   * FUNCTION 기능설명 : Sesstion Token 토큰 커밋
   *******************************************************************************/
-  async commitServiceTokenSession(requestSessionToken) {
+  async commitSessionToken(requestSessionToken) {
       const path = `/v1/user-requests/${requestSessionToken}/commit`;
   
       const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, {});
@@ -430,14 +450,14 @@ class LBD {
    * FUNCTION 기능설명 : Service Token 전송
   *******************************************************************************/
   async transferServiceToken(toUID, amount) {
-    const walletAddress = 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05';
-    const contractId = '3e942bd7';
+    const walletAddress = 'link159p2trejz4zfusfkx4eumrup5prlhh90nync6m';
+    const contractId = '173b6063';
     const resultAmount = amount * 1_000_000;
 
     const path = `/v1/wallets/${walletAddress}/service-tokens/${contractId}/transfer`;
     console.log(toUID, amount);
     const body = {
-      'walletSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'walletSecret': 'ZTlTEs25NXQhUtu7I/vrlKjpSt+YyDwk2zOYZty+7Js=',
       'toUserId': toUID,
       'amount': resultAmount + '',
     }
@@ -446,7 +466,49 @@ class LBD {
 
     return await api(path, 'POST', headers, null, body);
   }
-  
+ 
+  /*******************************************************************************
+   * FUNCTION 명 : transferNFT()
+   * FUNCTION 기능설명 : NFT 전송
+  *******************************************************************************/
+  async transferNFT(paramObj) {
+
+    const { userId, contractId, tokenType, tokenIndex, toAddress } = paramObj;
+    console.log('userId: ', userId);
+    console.log('contractId: ', contractId);
+    console.log('tokenType: ', tokenType);
+
+    const path = `/v1/users/${userId}/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/transfer`;
+    const body = {
+      'ownerAddress': 'tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05',
+      'ownerSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'toAddress': toAddress
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+
+  /*******************************************************************************
+   * FUNCTION 명 : soWalletTransferNFT()
+   * FUNCTION 기능설명 : 서비스 월렛에 있는 NFT 전송
+  *******************************************************************************/
+  async soWalletTransferNFT(paramObj) {
+
+    const { soWalletAddress, contractId, tokenType, tokenIndex, toAddress } = paramObj;
+
+    const path = `/v1/wallets/${soWalletAddress}/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/transfer`;
+    const body = {
+      'walletSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'toAddress': toAddress
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+
   /*******************************************************************************
    * FUNCTION 명 : transferDelegatedServiceToken()
    * FUNCTION 기능설명 : 위임된 서비스 토큰 전송(사용자 지갑)
@@ -467,7 +529,6 @@ class LBD {
 
     return await api(path, 'POST', headers, null, body);
   }
-
 
   /*******************************************************************************
    * FUNCTION 명 : updateNftInfo()
@@ -500,12 +561,28 @@ class LBD {
       'updateList': [
         {
           'tokenType': '10000001',
-          'tokenIndex': '00000001'
+          'tokenIndex': '00000001' 
         },
         {
           'tokenType': '10000001',
-          'tokenIndex': '00000002'
-        }
+          'tokenIndex': '00000002' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000003' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000004' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000005' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000006' 
+        },
       ],
     }
     const { timestamp, nonce, signature } = await this.getSignature('PUT', path, {}, body);
@@ -527,6 +604,26 @@ class LBD {
         {
           'tokenType': '10000001',
           'tokenIndex': '00000001' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000002' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000003' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000004' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000005' 
+        },
+        {
+          'tokenType': '10000001',
+          'tokenIndex': '00000006' 
         },
       ]
     }
