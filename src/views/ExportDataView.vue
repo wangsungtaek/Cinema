@@ -53,6 +53,27 @@
             조회
           </el-button>
         </el-card>
+
+        <!-- 시티즌 TOP50 -->
+        <el-card class="box-card customCard" style="height: 400px; position: relative;">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >시티즌 TOP 60</h3>
+            </div>
+          </template>
+          <el-input v-model="tokenType" placeholder="tokenType" class="customInput"/>
+          <div></div>
+          <div class="mb-2 flex items-center text-sm">
+            <el-radio-group v-model="format" class="ml-4">
+              <el-radio label="csv" size="large">.csv</el-radio>
+              <el-radio label="txt" size="large">.txt</el-radio>
+            </el-radio-group>
+          </div>
+          <el-button type="primary" @click="getCitizenRanking(tokenType)" class="customButton">
+            조회
+          </el-button>
+        </el-card>
+
       </el-space>
 
     </el-container>
@@ -208,6 +229,32 @@ export default {
       }
 
       return csv;
+    },
+
+    // 시티즌 TOP60 조회
+    async getCitizenRanking(tokenType) {
+      const contractId = "f68e7fd5";
+      const limit = "30";
+      let result = [];
+      
+      const ranking = await this.lbd.getNonFungibleHolder(contractId, tokenType, limit, "1");
+      const ranking2 = await this.lbd.getNonFungibleHolder(contractId, tokenType, limit, "2");    
+      result = [...ranking.responseData, ...ranking2.responseData];
+      
+      // Download
+      let row = [];
+      let csv = [];
+
+      row.push("number", "token type", "address", "numberOfIndex");
+      csv.push(row.join(","));
+
+      for(let i = 0; i < result.length; i++) {
+        row = [];
+        row.push(i+1, tokenType, result[i].walletAddress, result[i].numberOfIndex);
+        csv.push(row.join(","));
+      }
+
+      this.downloadCSV(csv.join("\n"), contractId);
     },
 
     downloadCSV(csv, contractId) {

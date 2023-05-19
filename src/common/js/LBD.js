@@ -188,13 +188,17 @@ class LBD {
    * FUNCTION 명 : getNonFungibleHolder()
    * FUNCTION 기능설명 : NonFungible 사용자 조회
   *******************************************************************************/
-  async getNonFungibleHolder(contractId, tokenType) {
+  async getNonFungibleHolder(contractId, tokenType, limit, page) {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/holders`;
+    const query_param = {
+      'limit': limit? limit : "",
+      'page': page? page : "",
+    }
 
-    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);
     const headers = this.getHeader(nonce, timestamp, signature);
 
-    return await api(path, 'GET', headers);
+    return await api(path, 'GET', headers, query_param);
   }
   /*******************************************************************************
    * FUNCTION 명 : getNonFungibleHolderByIndex()
