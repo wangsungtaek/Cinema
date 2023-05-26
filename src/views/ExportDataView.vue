@@ -185,6 +185,7 @@ export default {
 
       const addressArray = [];
       const numberArray = [];
+      const startPageToken = this.pageToken? this.pageToken : 'first';
 
       const limit = 50;
       for(let i=0; i<50; i++) {
@@ -220,7 +221,8 @@ export default {
         csv.push(row.join(","));
       }
       this.format = 'csv';
-      this.downloadCSV(csv.join("\n"), this.contractId);
+      console.log('###startPageToken', startPageToken);
+      this.downloadCSV(csv.join("\n"), this.contractId, startPageToken);
 
     },
 
@@ -320,9 +322,16 @@ export default {
       this.downloadCSV(csv.join("\n"), contractId);
     },
 
-    downloadCSV(csv, contractId) {
+    downloadCSV(csv, contractId, editFileName) {
       const nowDate = new Date();
-      const fileName = `${nowDate.getFullYear()}${nowDate.getMonth()+1}${nowDate.getDate()}_${nowDate.getHours()}${nowDate.getMinutes()}${nowDate.getSeconds()}_${contractId}`;
+      let fileName = '';
+
+      if(editFileName.length >= 0) {
+        fileName = editFileName;
+      } else {
+        fileName = `${nowDate.getFullYear()}${nowDate.getMonth()+1}${nowDate.getDate()}_${nowDate.getHours()}${nowDate.getMinutes()}${nowDate.getSeconds()}_${contractId}`;
+      }
+      
 
       let csvFile;
       let downloadLink;
