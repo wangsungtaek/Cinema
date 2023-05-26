@@ -257,6 +257,23 @@ class LBD {
     return await api(path, 'GET', headers, query_param);
   }
 
+    /*******************************************************************************
+   * FUNCTION 명 : getItemTokenHoldersNew()
+   * FUNCTION 기능설명 : Contract Id, Token Type을 통한 홀더들 조회 (Page Token)
+  *******************************************************************************/
+  async getItemTokenHoldersNew(contractId, tokenType, limit, pageToken) {
+    const path = `/v2/item-tokens/${contractId}/non-fungibles/${tokenType}/holders`;
+
+    const query_param = {
+      'limit': limit + '',
+      'pageToken': pageToken + ''
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);
+    const headers = this.getHeader(nonce, timestamp, signature);
+    
+    return await api(path, 'GET', headers, query_param);
+  }
+
   /*************************************************************************************************************************
     User 조회 관련
   *************************************************************************************************************************/

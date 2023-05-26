@@ -30,6 +30,22 @@
         </el-card>
 
         <!-- Contract ID, Token Type으로 홀더 조회 -->
+        <el-card class="box-card customCard" style="height: 400px;">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT 보유 홀더 조회(5/25 update)</h3>
+            </div>
+          </template>
+          <el-input v-model="contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="pageToken" placeholder="pageToken" class="customInput"/>
+          <div></div>
+          <el-button type="primary" @click="getHoldersNew" class="customButton">
+            홀더 조회
+          </el-button>
+        </el-card>
+
+        <!-- Contract ID, Token Type으로 홀더 조회 -->
         <el-card class="box-card customCard" style="height: 400px; position: relative;">
           <template #header>
             <div class="card-header">
@@ -92,6 +108,7 @@ export default {
       lbd: {},
       fromPage: '1',
       toPage: '30',
+      pageToken: '',
       currentPage: '0',
       startIndex: '',
       endIndex: '',
@@ -157,6 +174,52 @@ export default {
         csv.push(row.join(","));
       }
 
+      this.downloadCSV(csv.join("\n"), this.contractId);
+
+    },
+
+    async getHoldersNew() {
+      
+      let result = {};
+      let responseData = [];
+
+      const addressArray = [];
+      const numberArray = [];
+
+      const limit = 50;
+      for(let i=0; i<50; i++) {
+        try {
+          result = await this.lbd.getItemTokenHoldersNew(this.contractId, this.tokenType, limit, this.pageToken);
+          this.pageToken = result?.responseData?.nextPageToken;
+          responseData = result?.responseData?.list;
+          if(this.pageToken == '' || this.pageToken.length <= 0 || result?.responseData.length == 0) {
+            console.log(i);
+            break;
+          }
+          for(let i = 0; i < responseData.length; i++) {
+            addressArray.push(responseData[i]?.walletAddress);
+            numberArray.push(responseData[i]?.numberOfIndex);
+          }
+        } catch {
+          break;
+        }
+      }
+      
+      // csv 헤더 설정
+      let row = [];
+      const csv = [];
+
+      row.push("address", "numberOfIndex");
+      console.log('row', row);
+      csv.push(row.join(","));
+
+      // csv 데이터 작성
+      for(let i = 0; i < addressArray.length; i++) {
+        row = [];
+        row.push(addressArray[i], numberArray[i]);
+        csv.push(row.join(","));
+      }
+      this.format = 'csv';
       this.downloadCSV(csv.join("\n"), this.contractId);
 
     },
