@@ -174,7 +174,7 @@ export default {
         csv.push(row.join(","));
       }
 
-      this.downloadCSV(csv.join("\n"), this.contractId);
+      this.downloadCSV(csv.join("\n"), this.contractId, "");
 
     },
 
@@ -255,7 +255,7 @@ export default {
 
       const exportData = await this.getHolderAndMetaData(contractId, tokenType, startNum, endNum);
       if(exportData.length > 1) {
-        this.downloadCSV(exportData.join("\n"), contractId);
+        this.downloadCSV(exportData.join("\n"), contractId, "");
       }
     },
 
@@ -318,8 +318,7 @@ export default {
         row.push(i+1, tokenType, result[i].walletAddress, result[i].numberOfIndex);
         csv.push(row.join(","));
       }
-
-      this.downloadCSV(csv.join("\n"), contractId);
+      this.downloadCSV(csv.join("\n"), contractId, "");
     },
 
     downloadCSV(csv, contractId, editFileName) {
