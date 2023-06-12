@@ -343,6 +343,41 @@
           </el-button>
         </el-card>
 
+        <!-- so Wallet NFT Transfer -->
+          <el-card class="box-card">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT 결합</h3>
+            </div>
+          </template>
+          <el-input v-model="nft.contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="nft.tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="nft.tokenIndex" placeholder="tokenIndex" class="customInput"/>
+          <el-input v-model="nft.parentTokenId" placeholder="parentTokenId" class="customInput"/>
+          <el-input v-model="nft.tokenHolderAddress" placeholder="tokenHolderAddress" class="customInput"/>
+          
+          <el-button type="primary" @click="attachNFT" class="customButton">
+            attachNFT
+          </el-button>
+        </el-card>
+
+        <!-- so Wallet NFT Transfer -->
+        <el-card class="box-card">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >W300/f300</h3>
+            </div>
+          </template>
+          <div style="background: gray;">
+            <img src="https://lbw-impro.line-apps.com/v1/daphne/token/6d91a2c8/1000000100000001"/>
+            <img src="https://lbw-impro.line-apps.com/v1/daphne/token/6d91a2c8/1000000100000001/w300"/>
+            <img src="https://lbw-impro.line-apps.com/v1/daphne/token/6d91a2c8/1000000100000001/f300"/>
+            <img src="https://lbw-impro.line-apps.com/v1/daphne/token/6d91a2c8/1000000100000001/i260"/>
+          </div>
+          
+        </el-card>
+        
+
       </el-space>
 
     </el-container>
@@ -389,7 +424,9 @@ export default {
         toAddress: '',
         name: '',
         userId: '',
-        requestId: ''
+        requestId: '',
+        parentTokenId: '',
+        tokenHolderAddress: ''
       },
     }
   },
@@ -606,6 +643,18 @@ export default {
       const tokenIndex = this.nft.tokenIndex;
 
       const response = await this.lbd.getNonFungibleByTokenIndex(contractId, tokenType, tokenIndex);
+      console.log(response);
+    },
+
+    // 토큰 결합
+    async attachNFT() {
+      const contractId = this.nft.contractId;
+      const tokenType = this.nft.tokenType;
+      const tokenIndex = this.nft.tokenIndex;
+      const parentTokenId = this.nft.parentTokenId;
+      const tokenHolderAddress = this.nft.tokenHolderAddress;
+
+      const response = await this.lbd.attachNFT(contractId, tokenType, tokenIndex, parentTokenId, tokenHolderAddress);
       console.log(response);
     },
 

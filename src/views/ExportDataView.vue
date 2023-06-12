@@ -90,6 +90,27 @@
           </el-button>
         </el-card>
 
+        <!-- Search NFT by walletaddress -->
+        <el-card class="box-card customCard" style="height: 400px; position: relative;">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >Search NFT by Walletaddress</h3>
+            </div>
+          </template>
+          <el-input v-model="walletAddress" placeholder="walletAddress" class="customInput"/>
+          <el-input v-model="contractId" placeholder="contractId" class="customInput"/>
+          <div></div>
+          <div class="mb-2 flex items-center text-sm">
+            <el-radio-group v-model="format" class="ml-4">
+              <el-radio label="csv" size="large">.csv</el-radio>
+              <el-radio label="txt" size="large">.txt</el-radio>
+            </el-radio-group>
+          </div>
+          <el-button type="primary" @click="getNftByAddress()" class="customButton">
+            조회
+          </el-button>
+        </el-card>
+
       </el-space>
 
     </el-container>
@@ -99,6 +120,8 @@
 <script>
 import LBD from '@/common/js/LBD';
 import axios from "axios";
+import { chain } from 'lodash';
+// import { walletAddress } from '../common/js/lbd/header';
 
 export default {
   data() {
@@ -112,7 +135,8 @@ export default {
       currentPage: '0',
       startIndex: '',
       endIndex: '',
-      format: 'txt'
+      format: 'txt',
+      walletAddress: ''
     }
   },
 
@@ -319,6 +343,51 @@ export default {
         csv.push(row.join(","));
       }
       this.downloadCSV(csv.join("\n"), contractId, "");
+    },
+
+    // 5. Search NFT by Walletaddress
+    async getNftByAddress() {
+      const walletAddress = this.walletAddress;
+      const contract = this.contractId;
+      let pageToken = '';
+      let during = true;
+      const nftList = [];
+
+      try {
+        let response = '';
+        let data = '';
+        
+        while(during) {
+          response = await this.lbd.getNftByAddress(walletAddress, contract, pageToken);
+          data = response?.data;
+          pageToken = response?.pageToken;
+          if(data !== undefined || data !== null || data.length != 0) {
+            nftList.push(...data);
+          }
+
+          // while 정지
+          if(pageToken == '' || !pageToken || pageToken == undefined || pageToken == undefined) {
+            during = false;
+          }
+        }
+      } catch(e) {
+        console.log(e);
+      }
+
+      // Download
+      let row = [];
+      let csv = [];
+
+      row.push("token type", "token index");
+      csv.push(row.join(","));
+
+      for(let i = 0; i < nftList.length; i++) {
+        row = [];
+        row.push(nftList[i].tokenType, nftList[i].tokenIndex);
+        csv.push(row.join(","));
+      }
+      this.downloadCSV(csv.join("\n"), "", walletAddress);
+      
     },
 
     downloadCSV(csv, contractId, editFileName) {

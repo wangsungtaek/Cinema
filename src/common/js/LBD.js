@@ -2,7 +2,7 @@ import api from './myGlobal';
 import axios from "axios";
 import SignatureGenerator from "./lbd/signature";
 import { generateRandomString } from './lbd/randomStr.js';
-import { walletAddress, walletSecret, apiKey, apiSecret } from './lbd/header.js';
+import { walletAddress, walletSecret, apiKey, apiSecret, internalAPIKey } from './lbd/header.js';
 
 class LBD {
 
@@ -327,6 +327,22 @@ class LBD {
     return await api(path, 'GET', headers);
   }
   /*******************************************************************************
+   * FUNCTION 명 : getNftByAddress()
+   * FUNCTION 기능설명 : 사용자 Item Token 조회
+  *******************************************************************************/
+  async getNftByAddress(address, contractId, pageToken) {
+    const path = `/api/v1/wallets/${address}/item-tokens/${contractId}/non-fungibles`;
+    
+    const headers = {
+      'Authorization': 'Bearer ' + internalAPIKey
+    }
+    const queryParam = {
+      'pageToken': pageToken ? pageToken : ''
+    }
+
+    return await api(path, 'GET', headers, queryParam);
+  }
+  /*******************************************************************************
    * FUNCTION 명 : issueNFT()
    * FUNCTION 기능설명 : NFT 발행
   *******************************************************************************/
@@ -354,9 +370,27 @@ class LBD {
     const body = {
       'ownerAddress': walletAddress,
       'ownerSecret': walletSecret,
-      // 'toAddress': toAddress,
-      'toUserId': 'U3e4a86da83dd1649b794f78ac0f813d6',
+      'toAddress': toAddress,
+      // 'toUserId': 'U3e4a86da83dd1649b794f78ac0f813d6',
       'name': name
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+  /*******************************************************************************
+   * FUNCTION 명 : attachNFT()
+   * FUNCTION 기능설명 : NFT 결합
+  *******************************************************************************/
+  async attachNFT(contractId, tokenType, tokenIndex, parentTokenId, tokenHolderAddress) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/parent`;
+    
+    const body = {
+      'parentTokenId': parentTokenId,
+      'serviceWalletAddress': walletAddress,
+      'serviceWalletSecret': walletSecret,
+      'tokenHolderAddress': tokenHolderAddress
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
     const headers = this.getHeader(nonce, timestamp, signature);
@@ -404,7 +438,7 @@ class LBD {
     const path = `/v1/users/${userId}/item-tokens/${contractId}/request-proxy?requestType=redirectUri`;
 
     const request_body = {
-      'ownerAddress': "tlink1w0wn9ryg2rnj7djqu0zlvxkjpdnqxcnzh8gm05",
+      'ownerAddress': walletAddress,
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, request_body);
     const headers = {
@@ -521,7 +555,7 @@ class LBD {
 
     const path = `/v1/wallets/${soWalletAddress}/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/transfer`;
     const body = {
-      'walletSecret': 'knA4KnaHI+cTCatD8kWHBC9WvygjpbE8+sNgaLmzXds=',
+      'walletSecret': 'ZTlTEs25NXQhUtu7I/vrlKjpSt+YyDwk2zOYZty+7Js=',
       'toAddress': toAddress
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
