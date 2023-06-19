@@ -380,6 +380,23 @@ class LBD {
     return await api(path, 'POST', headers, null, body);
   }
   /*******************************************************************************
+   * FUNCTION 명 : burnNFT()
+   * FUNCTION 기능설명 : NFT 소각
+  *******************************************************************************/
+  async burnNFT(contractId, tokenType, tokenIndex, fromAddress) {
+    const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/burn`;
+    
+    const body = {
+      'ownerAddress': walletAddress,
+      'ownerSecret': walletSecret,
+      'fromAddress': fromAddress,
+    }
+    const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+    const headers = this.getHeader(nonce, timestamp, signature);
+
+    return await api(path, 'POST', headers, null, body);
+  }
+  /*******************************************************************************
    * FUNCTION 명 : attachNFT()
    * FUNCTION 기능설명 : NFT 결합
   *******************************************************************************/

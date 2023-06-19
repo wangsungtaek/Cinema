@@ -217,13 +217,13 @@ export default {
           result = await this.lbd.getItemTokenHoldersNew(this.contractId, this.tokenType, limit, this.pageToken);
           this.pageToken = result?.responseData?.nextPageToken;
           responseData = result?.responseData?.list;
-          if(this.pageToken == '' || this.pageToken.length <= 0 || result?.responseData.length == 0) {
-            console.log(i);
-            break;
-          }
           for(let i = 0; i < responseData.length; i++) {
             addressArray.push(responseData[i]?.walletAddress);
             numberArray.push(responseData[i]?.numberOfIndex);
+          }
+          if(this.pageToken == '' || this.pageToken.length <= 0 || result?.responseData.length == 0) {
+            console.log(i);
+            break;
           }
         } catch {
           break;

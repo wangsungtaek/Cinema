@@ -30,6 +30,7 @@ module.exports = defineConfig({
         },
         '/v2': {
           target: 'https://api.blockchain.line.me',
+          // target: 'https://test-api.blockchain.line-beta.me',
         },
       }
       // changeOrigin: true
