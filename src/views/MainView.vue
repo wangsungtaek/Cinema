@@ -306,6 +306,22 @@
             NFT Issue
           </el-button>
         </el-card>
+        <!-- NFT Issue -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT Burn</h3>
+            </div>
+          </template>
+          <el-input v-model="nft.contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="nft.tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="nft.tokenIndex" placeholder="tokenIndex" class="customInput"/>
+          <el-input v-model="nft.fromAddress" placeholder="fromAddress" class="customInput"/>
+          
+          <el-button type="primary" @click="burnNFT" class="customButton">
+            NFT Burn
+          </el-button>
+        </el-card>
 
         <!-- NFT Transfer -->
         <el-card class="box-card">
@@ -426,7 +442,8 @@ export default {
         userId: '',
         requestId: '',
         parentTokenId: '',
-        tokenHolderAddress: ''
+        tokenHolderAddress: '',
+        fromAddress: ''
       },
     }
   },
@@ -844,6 +861,17 @@ export default {
         const response = await this.lbd.issueNFT(contractId, name, meta);
         console.log(response);
       }
+    },
+
+    // NFT 소각
+    async burnNFT() {
+      const contractId = this.nft.contractId;
+      const tokenType = this.nft.tokenType;
+      const tokenIndex = this.nft.tokenIndex;
+      const fromAddress = this.nft.fromAddress;
+
+      const response = await this.lbd.burnNFT(contractId, tokenType, tokenIndex, fromAddress);
+      console.log(response);
     },
 
     // NFT 전송

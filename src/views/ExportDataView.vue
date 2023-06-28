@@ -111,6 +111,28 @@
           </el-button>
         </el-card>
 
+        <!-- Search NFT by walletaddress -->
+        <el-card class="box-card customCard" style="height: 400px; position: relative;">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >NFT 홀더 조회 + Meta data</h3>
+            </div>
+          </template>
+          <el-input v-model="contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="tokenType" placeholder="tokenType" class="customInput"/>
+          <el-input v-model="tokenIndex" placeholder="tokenIndex" class="customInput"/>
+          <div></div>
+          <div class="mb-2 flex items-center text-sm">
+            <el-radio-group v-model="format" class="ml-4">
+              <el-radio label="csv" size="large">.csv</el-radio>
+              <el-radio label="txt" size="large">.txt</el-radio>
+            </el-radio-group>
+          </div>
+          <el-button type="primary" @click="getHolderAndMeta()" class="customButton">
+            조회
+          </el-button>
+        </el-card>
+
       </el-space>
 
     </el-container>
@@ -128,6 +150,7 @@ export default {
     return {
       contractId: 'f68e7fd5',
       tokenType: '10000001',
+      tokenIndex: '',
       lbd: {},
       fromPage: '1',
       toPage: '30',
@@ -208,6 +231,7 @@ export default {
       let responseData = [];
 
       const addressArray = [];
+      const userIdArray = [];
       const numberArray = [];
       const startPageToken = this.pageToken? this.pageToken : 'first';
 
@@ -220,6 +244,7 @@ export default {
           for(let i = 0; i < responseData.length; i++) {
             addressArray.push(responseData[i]?.walletAddress);
             numberArray.push(responseData[i]?.numberOfIndex);
+            userIdArray.push(responseData[i]?.userId);
           }
           if(this.pageToken == '' || this.pageToken.length <= 0 || result?.responseData.length == 0) {
             console.log(i);
@@ -234,14 +259,14 @@ export default {
       let row = [];
       const csv = [];
 
-      row.push("address", "numberOfIndex");
+      row.push("address", "userId", "numberOfIndex");
       console.log('row', row);
       csv.push(row.join(","));
 
       // csv 데이터 작성
       for(let i = 0; i < addressArray.length; i++) {
         row = [];
-        row.push(addressArray[i], numberArray[i]);
+        row.push(addressArray[i], userIdArray[i], numberArray[i]);
         csv.push(row.join(","));
       }
       this.format = 'csv';
@@ -388,6 +413,27 @@ export default {
       }
       this.downloadCSV(csv.join("\n"), "", walletAddress);
       
+    },
+
+    // 6. 홀더 및 메타데이터 조회
+    async getHolderAndMeta() {
+      const contract = this.contractId;
+      const tokenType = this.tokenType;
+      const tokenIndex = this.tokenIndex;
+
+      const response = await this.lbd.getNonFungibleHolderByIndex(contract, tokenType, tokenIndex, true);
+      console.log(response);
+      const data = response?.responseData;
+
+      // Download
+      let row = [];
+      let csv = [];
+      
+      row.push("Wallet Address", "User Id", "token Id", "meta");
+      csv.push(row.join(","));
+      row = [data.walletAddress, data.userId, data.tokenId, data.meta];
+      csv.push(row.join(","));
+      this.downloadCSV(csv.join("\n"), "", data.tokenId);
     },
 
     downloadCSV(csv, contractId, editFileName) {

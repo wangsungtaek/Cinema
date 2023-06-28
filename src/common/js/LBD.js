@@ -204,13 +204,17 @@ class LBD {
    * FUNCTION 명 : getNonFungibleHolderByIndex()
    * FUNCTION 기능설명 : TokenIdex로 NonFungible 사용자 조회
   *******************************************************************************/
-  async getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex) {
+  async getNonFungibleHolderByIndex(contractId, tokenType, tokenIndex, isMetaRequired) {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/${tokenIndex}/holder`;
 
-    const { timestamp, nonce, signature } = await this.getSignature('GET', path);
+    const query_param = {
+      'isMetaRequired': isMetaRequired? true : false
+    }
+
+    const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);
     const headers = this.getHeader(nonce, timestamp, signature);
 
-    return await api(path, 'GET', headers);
+    return await api(path, 'GET', headers, query_param);
   }
   /*******************************************************************************
    * FUNCTION 명 : getServiceWallet()
@@ -371,7 +375,7 @@ class LBD {
       'ownerAddress': walletAddress,
       'ownerSecret': walletSecret,
       'toAddress': toAddress,
-      // 'toUserId': 'U3e4a86da83dd1649b794f78ac0f813d6',
+      // 'toUserId': 'U3e4a86da83dd1649b794f7 ㅎ8ac0f813d6',
       'name': name
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
@@ -456,6 +460,7 @@ class LBD {
 
     const request_body = {
       'ownerAddress': walletAddress,
+      'landingUri': 'http://localhost:3000'
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, request_body);
     const headers = {
