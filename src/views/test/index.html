@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test</title>
+</head>
+<body>
+  <h1>test</h1>
+  <button onclick="transferNFT()">Request Transfer NFT</button>
+  <script>
+    function transferNFT() {
+      var xhr = new XMLHttpRequest();
+      xhr.withCredentials = true;
+
+      xhr.addEventListener("readystatechange", function() {
+        if(this.readyState === 4) {
+          console.log(this.responseText);
+        }
+      });
+
+      xhr.open("GET", "https://api.blockchain.line-beta.me/v1/time");
+      xhr.setRequestHeader("service-api-key", "577772d8-bace-4f62-8a3e-ab5ced75fe98");
+
+      xhr.send();
+    }
+    
+    
+  </script>
+</body>
+</html>

@@ -134,11 +134,11 @@
         </el-card>
 
       </el-space>
+      <div data-tf-widget="xrYjNM0u" data-tf-opacity="100" data-tf-iframe-props="title=My branded typeform" data-tf-transitive-search-params data-tf-medium="snippet" style="width:100%;height:500px;"></div>
 
     </el-container>
   </div>
 </template>
-
 <script>
 import LBD from '@/common/js/LBD';
 import axios from "axios";

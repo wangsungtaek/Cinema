@@ -192,6 +192,7 @@ class LBD {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/holders`;
     const query_param = {
       'limit': limit? limit : "",
+      'orderBy': 'asc',
       'page': page? page : "",
     }
 
@@ -210,7 +211,7 @@ class LBD {
     const query_param = {
       'isMetaRequired': isMetaRequired? true : false
     }
-
+    // https://dev.hellovacay.com/dosi/
     const { timestamp, nonce, signature } = await this.getSignature('GET', path, query_param);
     const headers = this.getHeader(nonce, timestamp, signature);
 
@@ -368,7 +369,7 @@ class LBD {
    * FUNCTION 명 : mintNFT()
    * FUNCTION 기능설명 : NFT 민팅
   *******************************************************************************/
-  async mintNFT(contractId, tokenType, toAddress, name) {
+  async mintNFT(contractId, tokenType, toAddress, name, meta) {
     const path = `/v1/item-tokens/${contractId}/non-fungibles/${tokenType}/mint`;
     
     const body = {
@@ -376,7 +377,10 @@ class LBD {
       'ownerSecret': walletSecret,
       'toAddress': toAddress,
       // 'toUserId': 'U3e4a86da83dd1649b794f7 ㅎ8ac0f813d6',
-      'name': name
+      'name': name,
+      'meta': meta,
+      // 'meta': '{"key": "value"}'
+      // 'meta': '<a src="naver.com">NAVER</a>'
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
     const headers = this.getHeader(nonce, timestamp, signature);
@@ -456,11 +460,12 @@ class LBD {
    * FUNCTION 기능설명 : NFT 세션 토큰 확인
   *******************************************************************************/
   async getNFTSession(userId, contractId) {
-    const path = `/v1/users/${userId}/item-tokens/${contractId}/request-proxy?requestType=redirectUri`;
+    const path = `/v1/users/${userId}/item-tokens/${contractId}/request-proxy?requestType=email`;
 
     const request_body = {
       'ownerAddress': walletAddress,
-      'landingUri': 'http://localhost:3000'
+      'landingUri': 'http://localhost:3000',
+      'email': 'tjdxorv@naver.com'
     }
     const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, request_body);
     const headers = {
@@ -585,6 +590,24 @@ class LBD {
 
     return await api(path, 'POST', headers, null, body);
   }
+
+  /*******************************************************************************
+   * FUNCTION 명 : soWalletMultiTransferNFT()
+   * FUNCTION 기능설명 : 서비스 월렛에 있는 Multi NFT 전송
+  *******************************************************************************/
+    async soWalletMultiTransferNFT(soWallet, contractId, toAddress, transferList) {
+  
+      const path = `/v1/wallets/${soWallet}/item-tokens/${contractId}/non-fungibles/batch-transfer`;
+      const body = {
+        'walletSecret': walletSecret,
+        'toAddress': toAddress,
+        'transferList': transferList
+      }
+      const { timestamp, nonce, signature } = await this.getSignature('POST', path, {}, body);
+      const headers = this.getHeader(nonce, timestamp, signature);
+  
+      return await api(path, 'POST', headers, null, body);
+    }
 
   /*******************************************************************************
    * FUNCTION 명 : transferDelegatedServiceToken()

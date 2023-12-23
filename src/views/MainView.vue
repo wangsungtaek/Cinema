@@ -34,6 +34,19 @@
             </el-button>
         </el-card>
 
+        <!-- 유저 정보 확인 -->
+        <el-card class="box-card customCard">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >유저 정보 확인</h3>
+            </div>
+          </template>
+            <el-input v-model="user.uid" placeholder="UID" class="customInput"/>
+            <el-button type="primary" @click="getUserInfo" class="customButton">
+              유저 정보 조회
+            </el-button>
+        </el-card>
+
         <!-- 서비스 토큰 프록시 상태 확인 -->
         <el-card class="box-card customCard">
           <template #header>
@@ -228,6 +241,7 @@
           <el-input v-model="nft.tokenType" placeholder="tokenType" class="customInput"/>
           <el-input v-model="nft.toAddress" placeholder="toAddress" class="customInput"/>
           <el-input v-model="nft.name" placeholder="name" class="customInput"/>
+          <el-input v-model="nft.meta" placeholder="meta" class="customInput"/>
           
           <el-button type="primary" @click="mintNFT" class="customButton">
             NFT 민트
@@ -359,7 +373,23 @@
           </el-button>
         </el-card>
 
-        <!-- so Wallet NFT Transfer -->
+        <!-- so Wallet NFT Multi Transfer -->
+        <el-card class="box-card">
+          <template #header>
+            <div class="card-header">
+              <h3 style="margin: 0px" >So Wallet NFT Multi Transfer</h3>
+            </div>
+          </template>
+          <el-input v-model="nft.soWalletAddress" placeholder="soWalletAddress" class="customInput"/>
+          <el-input v-model="nft.contractId" placeholder="contractId" class="customInput"/>
+          <el-input v-model="nft.toAddress" placeholder="toAddress" class="customInput"/>
+          
+          <el-button type="primary" @click="soWalletMultiTransferNFT" class="customButton">
+            So Wallet NFT Multi Transfer
+          </el-button>
+        </el-card>
+
+        <!-- NFT Attach -->
           <el-card class="box-card">
           <template #header>
             <div class="card-header">
@@ -439,6 +469,7 @@ export default {
         tokenIndex: '',
         toAddress: '',
         name: '',
+        meta: '',
         userId: '',
         requestId: '',
         parentTokenId: '',
@@ -480,6 +511,11 @@ export default {
       const response = await this.lbd.getTxHash(this.txHash);
       console.log(response);
     },
+    // 유저 정보 조회
+    async getUserInfo() {
+      const response = await this.lbd.getUserInfo(this.user.uid);
+      console.log(response);
+    },
 
     async testAPI() {
 
@@ -497,7 +533,7 @@ export default {
       // console.log('## Service Token Holder By ContractId :', await lbd.getServiceTokenHolderBycontractId('9990f166'));
 
       
-      // console.log('## itemToken :', await lbd.getItemToken('5de7845d'));
+      console.log('## itemToken :', await this.lbd.getItemToken('f68e7fd5'));
       // console.log('## fungible Token :', await lbd.getFungibleList('5de7845d'));
       // console.log('## non-fungible Token :', await lbd.getNonFungibleList('5de7845d'));
       // console.log('## non-fungible Token Holder :', await lbd.getNonFungibleHolder('5de7845d', '10000001'));
@@ -638,8 +674,9 @@ export default {
     async getNftHolder() {
       const contractId = this.nft.contractId;
       const tokenType = this.nft.tokenType;
+      const limit = "50";
 
-      const response = await this.lbd.getNonFungibleHolder(contractId, tokenType);
+      const response = await this.lbd.getNonFungibleHolder(contractId, tokenType, limit, 3);
       console.log(response);
     },
 
@@ -815,8 +852,10 @@ export default {
       const tokenType = this.nft.tokenType;
       const toAddress = this.nft.toAddress;
       const name = this.nft.name;
+      const meta = this.nft.meta;
+      console.log(meta);
       
-      const response = await this.lbd.mintNFT(contractId, tokenType, toAddress, name);
+      const response = await this.lbd.mintNFT(contractId, tokenType, toAddress, name, meta);
       console.log(response);
 
     },
@@ -857,10 +896,10 @@ export default {
       const name = this.nft.name;
       const meta = this.nft.meta;
       
-      for(let i=0; i<200; i++) {
+      // for(let i=0; i<200; i++) {
         const response = await this.lbd.issueNFT(contractId, name, meta);
         console.log(response);
-      }
+      // }
     },
 
     // NFT 소각
@@ -901,8 +940,25 @@ export default {
       console.log(pathParam);
       const response = await this.lbd.soWalletTransferNFT(pathParam);
       console.log(response);
-    }
+    },
+
+
+    // 서비스 월렛의 NFT를 다중 전송
+    async soWalletMultiTransferNFT() {
+      
+      var data = require("./test/101data");
+      var data2 = require("./test/201data");
+
+      const soWalletAddress = this.nft.soWalletAddress;
+      const contractId = this.nft.contractId;
+      const toAddress = this.nft.toAddress;
+
+      const response = await this.lbd.soWalletMultiTransferNFT(soWalletAddress, contractId, toAddress, data);
+      const response2 = await this.lbd.soWalletMultiTransferNFT(soWalletAddress, contractId, toAddress, data2);
+      console.log(response);
+      console.log(response2);
+    },
 
   }
 }
-</script>
+</script>./test/101data

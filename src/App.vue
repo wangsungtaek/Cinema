@@ -28,7 +28,7 @@ nav a.router-link-exact-active {
 
 .customCard {
   width: 400px;
-  height: 350px;
+  height: 400px;
 }
 
 .customButton, .customInput {

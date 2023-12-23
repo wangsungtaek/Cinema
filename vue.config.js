@@ -20,16 +20,16 @@ module.exports = defineConfig({
         // proxy: 'https://api.blockchain.line.me',
         // Beta Main net
       proxy: {
-        '/api/v1': {
-          target: 'https://lbd-internal-api.line-apps.com',
-        },
+        // '/api/v1': {
+        //   target: 'https://lbd-internal-api.line-apps.com',
+        // },
         '/v1': {
-          target: 'https://api.blockchain.line.me',
+          target: 'https://test-api.blockchain.line.me',
           // target: 'https://test-api.blockchain.line-beta.me',
           // changeOrigin: true,
         },
         '/v2': {
-          target: 'https://api.blockchain.line.me',
+          target: 'https://test-api.blockchain.line.me',
           // target: 'https://test-api.blockchain.line-beta.me',
         },
       }
